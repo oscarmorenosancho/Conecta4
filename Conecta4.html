@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta 4</title>
+    <style>
+        body{
+            padding: 0px;
+            margin:0px;
+            background-color: darkblue;
+        }
+        div{
+            display: flex;
+        }
+
+        .container{
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            align-items: center;
+            background-color: black;
+        }
+        .row{
+            flex-direction: row;
+        }
+        .column{
+            background-color: red;
+            flex-direction: column;
+        }
+        .casilla{
+            background-color: blue;
+        }
+        .casilla-ins{
+            background-color: black;
+        }
+        .ficha{
+            border-radius: 4vmin;
+            background-color: black;
+            padding: 4vmin;
+            margin: 2vmin;
+        }
+        .ficha-ins{
+            border-radius: 4vmin;
+            background-color: black;
+            padding: 4vmin;
+            margin: 2vmin;
+        }
+        .ficha-player1{
+            background-color: red;
+        }
+        .ficha-player2{
+            background-color: yellow;
+        }
+        .dispcont{
+            display: block;
+            padding: 0;
+            align-content: center;
+            width: 100%;
+            height: 16vmin;
+            background-color: black;
+        }
+        .score{
+            display: block;
+            padding: 4vmin;
+            background-color: black;
+            color: white;
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 8vmin;
+        }
+        .textPlayer1{
+            color: red;            
+        }
+        .textPlayer2{
+            color: yellow;            
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row dispcont">
+            <div class="col score">Player 1</div>
+
+
+        </div>
+    </div>
+    <script>
+        let winnerPlayer = 0;
+        let currPlayer = 1;
+        let board = [
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0]
+        ]
+        const boxcontainer = document.querySelector('.container');
+        const insertrow = document.createElement('div'); 
+        insertrow.classList.add('row');
+        insertrow.classList.add('ins-row');
+        for(let i=0;i<7;i++){
+            const colins = document.createElement('div');
+            const casins = document.createElement('div');
+            const fichains = document.createElement('div');
+            const colname = `col-${i}`;
+            colins.classList.add('col');
+            colins.classList.add(colname);
+            casins.classList.add('casilla-ins');
+            fichains.classList.add('ficha-ins');
+            casins.appendChild(fichains);
+            colins.appendChild(casins);
+            insertrow.appendChild(colins);
+        }
+        boxcontainer.appendChild(insertrow);
+
+        for(let j=5;j>=0;j--){
+            const rowname = `row-${j}`;
+            const row = document.createElement('div'); 
+            row.classList.add('row');
+            row.classList.add(rowname);
+            for(let i=0;i<7;i++){
+                const col = document.createElement('div');
+                const cas = document.createElement('div');
+                const ficha = document.createElement('div');
+                const colname = `col-${i}`;
+                col.classList.add('col');
+                col.classList.add(colname);
+                cas.classList.add('casilla');
+                ficha.classList.add('ficha');
+                cas.appendChild(ficha);
+                col.appendChild(cas);
+                row.appendChild(col);
+            }
+        boxcontainer.appendChild(row);
+        }
+
+
+        //boxcontainer.
+        for (let i=0;i<7;i++)
+        {
+            let colid = `.col-${i}`;
+            let col = document.querySelectorAll(colid);
+            col.forEach((item)=>{
+                addColumListener(item);
+            
+            });
+        }
+        displayBoard();
+
+        function addColumListener(item)
+        {
+            item.addEventListener("click",(ev)=>{
+                const el = ev.target;
+                let pel = el.parentElement;
+                let cl = pel.classList;
+
+                if (winnerPlayer!=0){
+                    ResetBoard();
+                    winnerPlayer=0;
+                    currPlayer = 1;
+                    displayBoard();
+                }
+                else{
+                    while(!cl.contains("col"))
+                    {
+                        pel = pel.parentElement;
+                        cl = pel.classList;
+                    }
+                
+                    cl.forEach((cln)=>{
+                        if (cln != "col")
+                        {
+                            if(cln.startsWith("col-"))
+                            {
+                                console.log(cln);
+                                resetInsRow();
+                                const colSel = parseInt(cln.substring(4));
+                                console.log(colSel);
+                                const inrow = document.querySelector(".ins-row");
+                                console.log(inrow);
+                                if (inrow){
+                                    const inselcol = inrow.querySelector("."+cln);
+                                    console.log(inselcol);
+                                    if (inselcol){
+                                        const inselbox = inselcol.querySelector(".casilla-ins");
+                                        console.log(inselbox);
+                                        if(inselbox){
+                                            const insel = inselbox.querySelector(".ficha-ins");
+                                            console.log(insel);
+                                            insel.classList.add("ficha-player"+currPlayer);
+                                        }
+                                    }
+                                }
+                                setTimeout(()=>{insertChipInCol(colSel)},500);
+                                
+                            
+                            }
+                        }
+                    }
+                    )
+                }
+            });
+        }
+        
+
+    
+    function resetInsRow(){
+        const inrow = document.querySelector(".ins-row");
+        const listChips = inrow.querySelectorAll(".ficha-ins");
+        listChips.forEach((chip) => {
+            chip.classList.remove("ficha-player1"); 
+            chip.classList.remove("ficha-player2"); 
+        });
+
+    }
+
+    function insertChipInCol(col)
+    {
+        //console.log("col ",col);
+
+        let i=0
+        let found = board[i][col];
+        //console.log("col",i,"found",found);
+        while (found!=0 && i<6 )
+        {
+            found = board[i][col];
+            //console.log("col",i,"found",found);
+            if (found!=0) i++;
+        }  
+
+        if (found==0){
+            board[i][col] = currPlayer;
+            if (CheckWinner(i,col)){
+                winnerPlayer=currPlayer ;
+            }
+            else{
+                if (currPlayer!=1) currPlayer=1;
+                else currPlayer=2;
+            }
+        }
+
+        if(CheckAllBoardFull()){
+            winnerPlayer =2;
+            playerPlayer =2;
+        }
+      
+        resetInsRow();
+        displayBoard();
+        //console.log(board);
+    }
+
+    function displayBoard(){
+        for (let i = 0; i<6; i++){
+            const rowclass = `.row-${i}`;
+            const row = document.querySelector(rowclass);
+            for (let j = 0; j<7; j++) {
+                const colclass = `.col-${j}`;
+                const col = row.querySelector(colclass);
+                const chip = col.querySelector(".ficha");
+                let chipCL = chip.classList;
+                //console.log(chipCL);
+                if (chipCL.length>1){
+                    chipCL.remove("ficha-player1"); 
+                    chipCL.remove("ficha-player2");
+                }
+                if (board[i][j]==1)
+                    chipCL.add("ficha-player1");
+                else if (board[i][j]==2)
+                    chipCL.add("ficha-player2");
+                
+            }
+            
+        };
+                  
+        const textdisp = document.querySelector(".score");
+        let text2disp;
+        if(winnerPlayer!=0) {
+            text2disp = `Player : ${winnerPlayer} is the winner`;
+            currPlayer = winnerPlayer;
+        }
+        else{
+            text2disp = `Player : ${currPlayer}`
+        }
+        textdisp.innerHTML= text2disp;
+        if (currPlayer==1){
+            textdisp.classList.remove("textPlayer2")
+            textdisp.classList.add("textPlayer1")
+        }
+        else{
+            textdisp.classList.remove("textPlayer1")
+            textdisp.classList.add("textPlayer2")
+        }
+
+
+    }
+
+    function CheckWinner(row, col){
+        let scoreBranches = [0,0,0,0,0,0,0,0];
+        //1,-1      1,0         1,1
+        //
+        //0,-1      0,0         0,1
+        //
+        //-1,-1     -1,0        -1,1
+        let searchVectors = [
+            [1,0],[1,1],[0,1],[-1,1],
+            [-1,0],[-1,-1],[0,-1],[1,-1]
+        ]
+
+        for(let vecind=0;vecind<8;vecind++){
+            scoreBranches[vecind]=0;
+            const rowSerchDir=searchVectors[vecind][0];
+            const colSerchDir=searchVectors[vecind][1];
+            let i = row+rowSerchDir;
+            let j = col+colSerchDir;
+            while(i>=0 && i<6 && j>=0 && j<7 && board[i][j]==currPlayer){
+                i += rowSerchDir;
+                j += colSerchDir;
+                scoreBranches[vecind]++;
+            }
+        }
+        for (let inx=0;inx<4;inx++){
+            scoreBranches[inx] += scoreBranches[inx+4] + 1;
+            if (scoreBranches[inx]>3) return true;
+        }
+        return false;
+
+    }
+
+    function CheckAllBoardFull(){
+        for(let i=0;i<7;i++){
+            if (board[5][i]==0) return false;
+        }
+        return true;
+    }
+
+    function ResetBoard(){
+            board = [
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0]];
+        }
+</script>
+
+</body>
+</html>
